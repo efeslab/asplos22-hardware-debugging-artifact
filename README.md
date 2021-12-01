@@ -30,27 +30,31 @@ git clone https://github.com/efeslab/asplos22-hardware-debugging-artifact --recu
 
 After this command, you are expected to see the following directory hierarchy:
 
-```
+```bash
 asplos22-hardware-debugging-artifact
 ├── hardware-bugbase
+│   ├── c1-dead-lock-sdspi
+│   ├── c2-producer-consumer-mismatch-optimus
+│   ├── c3-data-control-asynchrony-sdspi
 │   ├── common
-│   ├── dblclockfft-integer-overflow
-│   ├── fadd-misindexing
-│   ├── grayscale-fifo-overflow
+│   ├── d1-buffer-overflow-rsd
+│   ├── d2-buffer-overflow-grayscale
+│   ├── d3-buffer-overflow-optimus
+│   ├── d4-bit-truncation-sha512
+│   ├── d5-bit-truncation-fft
+│   ├── d6-misindexing-fadd
+│   ├── d7-endianness-mismatch-sdspi
+│   ├── d8-failure-to-reset-sha512
 │   ├── manual_debug_log
-│   ├── optimus-overflow-conflict
-│   ├── reed-solomon-decoder-buffer-overwrite
-│   ├── sdspi-endian
-│   ├── sdspi-path-merge
-│   ├── sdspi-startup-deadlock
-│   ├── sha512-valid-uncleared
-│   ├── verilog-axis-fail-to-reset
-│   ├── xilinx-axi-lite-incomplete-implementation
-│   └── xilinx-axi-stream-incomplete-implementation
+│   ├── s1-protocol-violation-axi-lite
+│   ├── s2-protocol-violation-axi-stream
+│   ├── scripts
+│   └── venv
 └── veripass
     ├── dbgtools
     ├── model
     ├── passes
+    ├── __pycache__
     ├── Pyverilog
     ├── recording
     ├── utils
@@ -130,10 +134,10 @@ make -j8
 And install the following python packages:
 
 ```bash
-pip3 install jinja2 sympy ply
+pip3 install jinja2 sympy ply gephistreamer
 ```
 
-And add the following lines to your `.bashrc` or `.zshrc` to help the scripts find `Vivado`, `Quartus`, and `VCS`. `Vivado` needs to be the `System Design` edition, `Quartus` needs to be the `Pro` edition with version 17.0, and `VCS` needs to be the `MX` edition.
+And add the following lines to your `.bashrc` or `.zshrc` to help the scripts find `Vivado`, `Quartus`, and `VCS`. `Vivado` must be the `System Design` edition, `Quartus` must be the `Pro` edition with version `17.0`, and `VCS` must be the `MX` edition.
 
 ```bash
 # Quartus Pro
@@ -164,6 +168,8 @@ export PATH=$OPAE_PLATFORM_ROOT/bin:$PATH
 
 #### 2.2.1 Debugging Logs with SignalCat and the Monitors
 
+
+
 #### 2.2.2 Reproducing the Resource Overhead (Intel FPGA)
 
 #### 2.2.3 Reproducing the Resource Overhead (Xilinx FPGA)
@@ -171,6 +177,8 @@ export PATH=$OPAE_PLATFORM_ROOT/bin:$PATH
 ### 2.3 LossCheck
 
 #### 2.3.1 Data Loss Localization for the 4 Data Loss Bugs
+
+
 
 #### 2.3.2 Reproducing the Resource Overhead
 
