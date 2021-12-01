@@ -1,3 +1,7 @@
 [submodule "hardware-bugbase"]
 	path = hardware-bugbase
 	url = https://github.com/efeslab/hardware-bugbase
+
+[submodule "veripass"]
+	path = veripass
+	url = https://github.com/efeslab/veripass
