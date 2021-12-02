@@ -4,7 +4,7 @@ This artifact includes 13 hardware bugs, each of them can be reproduced with Ver
 
 ## Table of Contents
 
-- [0. Downloading the Repository](#downloading-the-repository)
+- [0. Downloading the Repository](#0-downloading-the-repository)
 
 - [1. Reproducible Bugs](#1-reproducible-bugs)
   - [1.1 Installation](#1-1-installation)
@@ -13,8 +13,7 @@ This artifact includes 13 hardware bugs, each of them can be reproduced with Ver
   - [2.1 Installation](#2-1-installation)
   - [2.2 SignalCat and the Monitors](#2-2-signalcat-and-monitors)
     - [2.2.1 Debugging Logs with SignalCat and the Monitors](#2-2-1-debugging-logs-with-signalcat-and-the-monitors)
-    - [2.2.2 Reproducing the Resource Overhead (Intel FPGA)](#2-2-2-reproducing-the-resource-overhead-intel-fpga)
-    - [2.2.3 Reproducing the Resource Overhead (Xilinx FPGA)](#2-2-3-reproducing-the-resource-overhead-xilinx-fpga)
+    - [2.2.2 Reproducing the Resource Overhead](#2-2-2-reproducing-the-resource-overhead)
   - [2.3 LossCheck](#2-3-losscheck)
     - [2.3.1 Data Loss Localization for the 4 Data Loss Bugs](#2-3-1-data-loss-localization-for-the-4-data-loss-bugs)
     - [2.3.2 Reproducing the Resource Overhead](#2-3-2-reproducing-the-resource-overhead)
@@ -25,7 +24,7 @@ This artifact includes 13 hardware bugs, each of them can be reproduced with Ver
 Use the following command to download the artifact repository:
 
 ```bash
-git clone https://github.com/efeslab/asplos22-hardware-debugging-artifact --recursive
+git clone --recursive https://github.com/efeslab/asplos22-hardware-debugging-artifact
 ```
 
 After this command, you are expected to see the following directory hierarchy:
@@ -48,13 +47,11 @@ asplos22-hardware-debugging-artifact
 │   ├── manual_debug_log
 │   ├── s1-protocol-violation-axi-lite
 │   ├── s2-protocol-violation-axi-stream
-│   ├── scripts
-│   └── venv
+│   └── scripts
 └── veripass
     ├── dbgtools
     ├── model
     ├── passes
-    ├── __pycache__
     ├── Pyverilog
     ├── recording
     ├── utils
@@ -97,7 +94,7 @@ To reproduce a specific bug:
 
 ```bash
 cd asplos22-hardware-debugging-artifact/hardware-bugbase/<bug-dir>
-make -j8
+make -j8 # compile the verilog code for simulation
 make sim  # run the simulation
 make wave # open the generated waveform with GTKWave
 ```
@@ -122,6 +119,10 @@ You are expected to see an error message after `make sim`. `make wave` requires 
 
 ## 2. Debugging Tools
 
+Our debugging tools locate in the `veripass` directory. In the `hardware-bugbase` directory, we provide `make` scripts to invoke these debugging tools.
+
+**Warning: A full evaluation of this part takes days, because FPGA synthesis is slow (e.g., up to several hours per-run). We encourage you to evaluate the non-synthesis part (e.g., [2.3.1](#2-3-1-data-loss-localization-for-the-4-data-loss-bugs)) first.**
+
 ### 2.1 Installation
 
 To run the debugging tools, you will need to compile `Verilator` and `Pyverilog` if you have not done so already:
@@ -137,7 +138,7 @@ And install the following python packages:
 pip3 install jinja2 sympy ply gephistreamer
 ```
 
-And add the following lines to your `.bashrc` or `.zshrc` to help the scripts find `Vivado`, `Quartus`, and `VCS`. `Vivado` must be the `System Design` edition, `Quartus` must be the `Pro` edition with version `17.0`, and `VCS` must be the `MX` edition.
+And add the following lines to your `.bashrc` or `.zshrc` to help the scripts find `Vivado`, `Quartus`, and `VCS`. `Vivado` must be the `Design Suite` edition, `Quartus` must be the `Pro` edition with version `17.0`, and `VCS` must be the `MX` edition.
 
 ```bash
 # Quartus Pro
@@ -156,31 +157,128 @@ export PATH=$VCS_HOME/bin:$PATH
 export SNPSLMD_LICENSE_FILE=<your-vcs-license>
 ```
 
-In order to synthesize projects for Intel HARP, you will need to download a supported version of Intel FPGA Basic Building Blocks, a set of platform files for HARP, and have the following additional lines in `.bashrc` or `.zshrc`. You can obtain our supported `intel-fpga-bbb` [here](https://github.com/efeslab/optimus-intel-fpga-bbb), and ask your Intel contact to obtain `BBS_6.4.0`. You may want to read [this](https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/manual/mnl-ias-ccip.pdf) to understand the interface of the HARP platform.
+In order to synthesize projects for Intel HARP, you will need to download a supported version of Intel FPGA Basic Building Blocks, a set of platform files for HARP, and have the following additional lines in `.bashrc` or `.zshrc`. You can ask your Intel contact for `BBS_6.4.0`. You may want to read [this](https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/manual/mnl-ias-ccip.pdf) to understand the interface of the HARP platform. It is theoretically possible to compile these HARP projects for the PAC platform (which is more widely available); however, we did not evaluate it.
 
 ```bash
-export FPGA_BBB_CCI_SRC=<your-bbb-location>/optimus-intel-fpga-bbb
-export OPAE_PLATFORM_ROOT=<your-opae-platform-root>/BBS_6.4.0
+export OPAE_PLATFORM_ROOT=<your-opae-platform-root-location>/BBS_6.4.0
 export PATH=$OPAE_PLATFORM_ROOT/bin:$PATH
+```
+
+The original framework for HARP simulation requires Python 2 as the default `python` command. As a result, you may need to set up a `virtualenv` with the following command:
+
+```bash
+virtualenv --python=/usr/bin/python2 <path-to-virtualenv>
 ```
 
 ### 2.2 SignalCat and the Monitors
 
 #### 2.2.1 Debugging Logs with SignalCat and the Monitors
 
+In Section 6.2 of the paper, we demonstrated that a developer can use SignalCat and the Monitors to localize all the 13 bugs in this artifact. We provide the mental debugging logs of a developer localizing these bugs in [this sheet](https://github.com/efeslab/hardware-bugbase/blob/f3f391be341e2f36462dd94bba98b8bffa81c34b/manual_debug_log/manual_debugging_agreements.xlsx). For each bug, the sheet includes the tools the developer would use at each step. The configurations for invoking these tools are located in a `.cfg` file under each bug's directory; you can invoke the tools using the following commands under each bug's directory:
 
+```bash
+make withtask.v
+```
 
-#### 2.2.2 Reproducing the Resource Overhead (Intel FPGA)
+After running this command, a file called `withtask.v` will be generated. This file contains the flattened verilog code with the debugging instrumentations described in the configuration.
 
-#### 2.2.3 Reproducing the Resource Overhead (Xilinx FPGA)
+#### 2.2.2 Reproducing the Resource Overhead
+
+To synthesize the instrumented circuit, you may run the following command:
+
+```bash
+source <path-to-virtualenv>/bin/activate # switch to a python virtualenv where python2 is the default
+make sweep_depth
+```
+
+This command will generate a number of files (e.g., instrumented circuit with different buffer size, the TCL scripts to invoke synthesis, etc) and invoke the synthesis script for the circuit and run syntheses with different recording buffer size. This command would froze for a long time, because each synthesis takes hours.
+
+After the command finishes, you can run the following command to report resource utilization.
+
+```bash
+make report_depth_sweep
+```
+
+For `D5`, `D6`, `D7`, `C1`, `C3`, `S1`, and `S2`, you will see something like the following.
+
+```
+log2(Depth),10,11,12,13
+Total LUTs,2225,2208,2191,2287
+FFs,2870,2881,2892,2905
+RAMB36,4,7,15,30
+RAMB18,0,1,0,0
+
+build_notask: Total LUTs,FFs,RAMB36,RAMB18
+        858;516;0;0
+```
+
+The upper block shows the resource utilization of instrumented circuit, and the bottom block shows the resource utilization of the uninstrumented circuit. In the paper, we use the word `Logic` for `LUT`, `Register` for `FF`, and calculate the total number of bits from `RAM36` (36Kbit per instance) and `RAM18` (18Kbit per instance). In the above example, the register overhead of an instrumented circuit with a `1024`-depth buffer is `2870-517=2354`.
+
+For `D1`, `D2`, `D3`, `D4`, `D8`, and `C2`, you will see something like the following. We use the `Logic` for `ALM`, `Register` for `FF`, and use the number of `BRAM Blocks` to calculate BRAM size (each block contains 20Kbits).
+
+```
+log2(Depth),10,11,12,13
+ALM,101170,101173,101185,101191
+BRAM#B,326,343,376,477
+BRAMbit,3989920,4332960,5019040,6391200
+FFs,111356,111371,111397,111447
+
+build_notask: ALM BRAM#B BRAMbit FFs
+100245;309;3646880;108734
+```
 
 ### 2.3 LossCheck
 
+Bug `D1`, `D2`, `D3`, and `C2` are the four data loss bugs that can be localized by LossCheck.
+
 #### 2.3.1 Data Loss Localization for the 4 Data Loss Bugs
 
+You can use the following command to invoke LossCheck under the directories of these four bugs.
 
+```bash
+make -f Makefile.lc
+```
+
+This will generate two `.v` files (e.g., a `<benchmark>.losscheck.0.v` and a `<benchmark>.losscheck.1.v`). `<benchmark.losscheck.0.v` is the first instrumentation, which does not filter false positives (as discussed in Section 4.5.3). Our scripts run the original testbench of the circuit on the first instrumentation, and generate a list of signals that should be filtered out (i.e., storing in `filter.txt`). Then, our scripts invoke LossCheck again, generating the second instrumentation (i.e., `<benchmark>.losscheck.1.v`), with the signals in `filter.txt` filtered out.
+
+To verify that the second instrumentation actually detects the data loss, run the following command:
+
+```bash
+make -f Makefile.lc sim
+```
+
+You are expected to see some error message with regard to data loss. For `D2`, `D3`, and `C3`, there should be no false positives. For `D1`, you are expected to see one register that's misidentified. (You will see several rows misreporting the same register.)
 
 #### 2.3.2 Reproducing the Resource Overhead
+
+You can use the following command to synthesize the circuit with and without LossCheck instrumentation. Please note each synthesis can take hours.
+
+```bash
+make -f Makefile.lc synth
+```
+
+And use the following command to report resource utilization.
+
+```bash
+make -f Makefile.lc report_util
+```
+
+You will get something like this:
+
+```
+build_withlosscheck: ALM BRAM#B BRAMbit FFs
+115428;775;11146672;139645
+build_notask: ALM BRAM#B BRAMbit FFs
+109694;413;5238192;130390
+```
+
+These four bugs are all on the Intel HARP platform. This platform contains a vendor-provided shell and an user-implemented accelerator. Because the shell is a fixed region, the resource overhead in Figure 3 is normalized to the resource used by the original (i.e., uninstrumented) accelerator (without the shell). You may use the following data as the resource utilization of the shell.
+
+| ALM    | FFs    |
+| ------ | ------ |
+| 100171 | 108659 |
+
+In the above example, the uninstremented accelerator uses 9523 ALMs, and the instrumented accelerator uses 15257 ALMs. As a result, the ALM (logic) overhead is `(15257-9523)=60.2%`.
 
 ## 3. Licenses and Terms
 
@@ -188,7 +286,7 @@ This artifact includes modified versions of Pyverilog (`veripass/Pyverilog`) and
 
 Our debugging tools under the `veripass` directory are released under the `GPLv3` license, whatever it means. Please also note that these tools are academic prototypes and may not be stable, reliable, or always correct; use it at your own risk.
 
-By downloading/cloning/forking the `veripass` repository, you have known and agreed to all terms included in `GPLv3`, and that the developers/authors of these tools will not be responsible for any of your losses and/or damages, including but not limited to the tools not working as expected, unexpected kernel panic, damage of software/hardware, unrecoverable data loss, your loved ones being unhappy of you working/hacking at 3am, and CK-class end-of-the-world scenarios that the SCP foundation cannot stop.
+By downloading/cloning/forking the `veripass` repository, you have known and agreed to all terms included in `GPLv3`, and that the developers/authors of these tools will not be responsible for any of your losses and/or damages, including but not limited to the tools not working as expected and your loved ones being unhappy of you working/hacking at 3am.
 
 If you find our work interesting, please cite our paper.
 
