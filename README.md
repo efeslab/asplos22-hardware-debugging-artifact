@@ -7,16 +7,16 @@ This artifact includes 13 hardware bugs, each of them can be reproduced with Ver
 - [0. Downloading the Repository](#0-downloading-the-repository)
 
 - [1. Reproducible Bugs](#1-reproducible-bugs)
-  - [1.1 Installation](#1-1-installation)
-  - [1.2 Reproducing Bugs with Verilator](#1-2-table-of-bugs)
+  - [1.1 Installation](#11-installation)
+  - [1.2 Reproducing Bugs with Verilator](#12-table-of-bugs)
 - [2. Debugging Tools](#2-debugging-tools)
-  - [2.1 Installation](#2-1-installation)
-  - [2.2 SignalCat and the Monitors](#2-2-signalcat-and-monitors)
-    - [2.2.1 Debugging Logs with SignalCat and the Monitors](#2-2-1-debugging-logs-with-signalcat-and-the-monitors)
-    - [2.2.2 Reproducing the Resource Overhead](#2-2-2-reproducing-the-resource-overhead)
-  - [2.3 LossCheck](#2-3-losscheck)
-    - [2.3.1 Data Loss Localization for the 4 Data Loss Bugs](#2-3-1-data-loss-localization-for-the-4-data-loss-bugs)
-    - [2.3.2 Reproducing the Resource Overhead](#2-3-2-reproducing-the-resource-overhead)
+  - [2.1 Installation](#21-installation)
+  - [2.2 SignalCat and the Monitors](#22-signalcat-and-monitors)
+    - [2.2.1 Debugging Logs with SignalCat and the Monitors](#221-debugging-logs-with-signalcat-and-the-monitors)
+    - [2.2.2 Reproducing the Resource Overhead](#222-reproducing-the-resource-overhead)
+  - [2.3 LossCheck](#23-losscheck)
+    - [2.3.1 Data Loss Localization for the 4 Data Loss Bugs](#231-data-loss-localization-for-the-4-data-loss-bugs)
+    - [2.3.2 Reproducing the Resource Overhead](#232-reproducing-the-resource-overhead)
 - [3. Licenses and Terms](#3-licenses-and-terms)
 
 ## 0. Downloading the Repository
@@ -121,7 +121,7 @@ You are expected to see an error message after `make sim`. `make wave` requires 
 
 Our debugging tools locate in the `veripass` directory. In the `hardware-bugbase` directory, we provide `make` scripts to invoke these debugging tools.
 
-**Warning: A full evaluation of this part takes days, because FPGA synthesis is slow (e.g., up to several hours per-run). We encourage you to evaluate the non-synthesis part (e.g., [2.3.1](#2-3-1-data-loss-localization-for-the-4-data-loss-bugs)) first.**
+**Warning: A full evaluation of this part takes days, because FPGA synthesis is slow (e.g., up to several hours per-run). We encourage you to evaluate the non-synthesis part (e.g., [2.3.1](#231-data-loss-localization-for-the-4-data-loss-bugs)) first.**
 
 ### 2.1 Installation
 
