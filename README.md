@@ -1,6 +1,6 @@
 # Debugging in the Brave New World of Reconfigurable Hardware  (Artifact)
 
-This artifact includes 13 hardware bugs, each of them can be reproduced with Verilator in a push-button manner. It also includes the five tools we designed to help bug localization (i.e., SignalCat, FSM Monitor, Statistics Monitor, Dependency Monitor, and LossCheck), as well as examples of using these tools and the instructions of reproducing the figures in the paper.
+This artifact includes 20 hardware bugs, each of them can be reproduced with Verilator in a push-button manner. It also includes the five tools we designed to help bug localization (i.e., SignalCat, FSM Monitor, Statistics Monitor, Dependency Monitor, and LossCheck), as well as examples of using these tools and the instructions of reproducing the figures in the paper.
 
 ## Table of Contents
 
@@ -15,7 +15,7 @@ This artifact includes 13 hardware bugs, each of them can be reproduced with Ver
     - [2.2.1 Debugging Logs with SignalCat and the Monitors](#221-debugging-logs-with-signalcat-and-the-monitors)
     - [2.2.2 Reproducing the Resource Overhead](#222-reproducing-the-resource-overhead)
   - [2.3 LossCheck](#23-losscheck)
-    - [2.3.1 Data Loss Localization for the 4 Data Loss Bugs](#231-data-loss-localization-for-the-4-data-loss-bugs)
+    - [2.3.1 Data Loss Localization for the 6 Data Loss Bugs](#231-data-loss-localization-for-the-6-data-loss-bugs)
     - [2.3.2 Reproducing the Resource Overhead](#232-reproducing-the-resource-overhead)
 - [3. Licenses and Terms](#3-licenses-and-terms)
 
@@ -34,19 +34,30 @@ asplos22-hardware-debugging-artifact
 ├── hardware-bugbase
 │   ├── c1-dead-lock-sdspi
 │   ├── c2-producer-consumer-mismatch-optimus
-│   ├── c3-data-control-asynchrony-sdspi
+│   ├── c3-signal-asynchrony-sdspi
+│   ├── c4-signal-asynchrony-axi-stream-fifo
 │   ├── common
+│   ├── d10-failure-to-update-sha512
+│   ├── d11-failure-to-update-frame-fifo
+│   ├── d12-failure-to-update-frame-fifo
+│   ├── d13-failure-to-update-frame-len
 │   ├── d1-buffer-overflow-rsd
 │   ├── d2-buffer-overflow-grayscale
 │   ├── d3-buffer-overflow-optimus
-│   ├── d4-bit-truncation-sha512
-│   ├── d5-bit-truncation-fft
-│   ├── d6-misindexing-fadd
-│   ├── d7-endianness-mismatch-sdspi
-│   ├── d8-failure-to-reset-sha512
+│   ├── d4-buffer-overflow-frame-buffer
+│   ├── d5-bit-truncation-sha512
+│   ├── d6-bit-truncation-fft
+│   ├── d7-misindexing-fadd
+│   ├── d8-misindexing-axis-switch
+│   ├── d9-endianness-mismatch-sdspi
 │   ├── manual_debug_log
+│   ├── n1-frame-len-failure-to-update
+│   ├── n3-frame-fifo-fail-to-update
+│   ├── n8-axis-adapter-incomplete-implementation
+│   ├── n9-frame-fifo-failure-to-update
 │   ├── s1-protocol-violation-axi-lite
 │   ├── s2-protocol-violation-axi-stream
+│   ├── s3-incomplete-implementation-axis-adapter
 │   └── scripts
 └── veripass
     ├── dbgtools
@@ -106,16 +117,23 @@ You are expected to see an error message after `make sim`. `make wave` requires 
 | D1     | [Buffer Overflow - RSD](https://github.com/efeslab/hardware-bugbase/tree/bugs/d1-buffer-overflow-rsd) |
 | D2     | [Buffer Overflow - Grayscale](https://github.com/efeslab/hardware-bugbase/tree/bugs/d2-buffer-overflow-grayscale) |
 | D3     | [Buffer Overflow - Optimus](https://github.com/efeslab/hardware-bugbase/tree/bugs/d3-buffer-overflow-optimus) |
-| D4     | [Bit Truncation - SHA512](https://github.com/efeslab/hardware-bugbase/tree/bugs/d4-bit-truncation-sha512) |
-| D5     | [Bit Truncation - FFT](https://github.com/efeslab/hardware-bugbase/tree/bugs/d5-bit-truncation-fft) |
-| D6     | [Misindexing - FADD](https://github.com/efeslab/hardware-bugbase/tree/bugs/d6-misindexing-fadd) |
-| D7     | [Endianness Mismatch - SDSPI](https://github.com/efeslab/hardware-bugbase/tree/bugs/d7-endianness-mismatch-sdspi) |
-| D8     | [Failure-to-Reset - SHA512](https://github.com/efeslab/hardware-bugbase/tree/bugs/d8-failure-to-reset-sha512) |
+| D4     | [Buffer Overflow - Frame FIFO](https://github.com/efeslab/hardware-bugbase/tree/bugs/d4-buffer-overflow-frame-buffer) |
+| D5     | [Bit Truncation - SHA512](https://github.com/efeslab/hardware-bugbase/tree/bugs/d5-bit-truncation-sha512) |
+| D6     | [Bit Truncation - FFT](https://github.com/efeslab/hardware-bugbase/tree/bugs/d6-bit-truncation-fft) |
+| D7     | [Misindexing - FADD](https://github.com/efeslab/hardware-bugbase/tree/bugs/d7-misindexing-fadd) |
+| D8     | [Misindexing - AXI-Stream Switch](https://github.com/efeslab/hardware-bugbase/tree/bugs/d8-misindexing-axis-switch) |
+| D9     | [Endianness Mismatch - SDSPI](https://github.com/efeslab/hardware-bugbase/tree/bugs/d9-endianness-mismatch-sdspi) |
+| D10    | [Failure-to-Update - SHA512](https://github.com/efeslab/hardware-bugbase/tree/bugs/d10-failure-to-update-sha512) |
+| D11    | [Failure-to-Update - Frame FIFO](https://github.com/efeslab/hardware-bugbase/tree/bugs/d11-failure-to-update-frame-fifo) |
+| D12    | [Failure-to-Update - Frame FIFO](https://github.com/efeslab/hardware-bugbase/tree/bugs/d12-failure-to-update-frame-fifo) |
+| D13    | [Failure-to-Update - Frame Length Measurer](https://github.com/efeslab/hardware-bugbase/tree/bugs/d13-failure-to-update-frame-len) |
 | C1     | [Dead Lock - SDSPI](https://github.com/efeslab/hardware-bugbase/tree/bugs/c1-dead-lock-sdspi) |
 | C2     | [Producer-Consumer Mismatch - Optimus](https://github.com/efeslab/hardware-bugbase/tree/bugs/c2-producer-consumer-mismatch-optimus) |
-| C3     | [Data-Control Asynchrony - SDSPI](https://github.com/efeslab/hardware-bugbase/tree/bugs/c3-data-control-asynchrony-sdspi) |
+| C3     | [Signal Asynchrony - SDSPI](https://github.com/efeslab/hardware-bugbase/tree/bugs/c3-signal-asynchrony-sdspi) |
+| C4     | [Signal Asynchrony - AXI-Stream FIFO](https://github.com/efeslab/hardware-bugbase/tree/bugs/c4-signal-asynchrony-axi-stream-fifo) |
 | S1     | [Protocol Violation - AXI-Lite](https://github.com/efeslab/hardware-bugbase/tree/bugs/s1-protocol-violation-axi-lite) |
 | S1     | [Protocol Violation - AXI-Stream](https://github.com/efeslab/hardware-bugbase/tree/bugs/s2-protocol-violation-axi-stream) |
+| S3     | [Incomplete Implementation - AXI-Stream Adapter](https://github.com/efeslab/hardware-bugbase/tree/bugs/s3-incomplete-implementation-axis-adapter) |
 
 ## 2. Debugging Tools
 
@@ -174,7 +192,7 @@ virtualenv --python=/usr/bin/python2 <path-to-virtualenv>
 
 #### 2.2.1 Debugging Logs with SignalCat and the Monitors
 
-In Section 6.2 of the paper, we demonstrated that a developer can use SignalCat and the Monitors to localize all the 13 bugs in this artifact. We provide the mental debugging logs of a developer localizing these bugs in [this sheet](https://github.com/efeslab/hardware-bugbase/blob/f3f391be341e2f36462dd94bba98b8bffa81c34b/manual_debug_log/manual_debugging_agreements.xlsx). For each bug, the sheet includes the tools the developer would use at each step. The configurations for invoking these tools are located in a `.cfg` file under each bug's directory; you can invoke the tools using the following commands under each bug's directory:
+In Section 6.2 of the paper, we demonstrated that a developer can use SignalCat and the Monitors to localize all the 20 bugs in this artifact. We provide the mental debugging logs of a developer localizing these bugs in [this sheet](https://github.com/efeslab/hardware-bugbase/blob/f3f391be341e2f36462dd94bba98b8bffa81c34b/manual_debug_log/manual_debugging_agreements.xlsx). For each bug, the sheet includes the tools the developer would use at each step. The configurations for invoking these tools are located in a `.cfg` file under each bug's directory; you can invoke the tools using the following commands under each bug's directory:
 
 ```bash
 make withtask.v
@@ -199,7 +217,7 @@ After the command finishes, you can run the following command to report resource
 make report_depth_sweep
 ```
 
-For `D5`, `D6`, `D7`, `C1`, `C3`, `S1`, and `S2`, you will see something like the following.
+For `D4`, `D6`, `D7`, `D8`, `D9`, `D11`, `D12`, `D13`, `C1`, `C3`, `C4`, `S1`, `S2`, and `S3`, you will see something like the following.
 
 ```
 log2(Depth),10,11,12,13
@@ -214,7 +232,7 @@ build_notask: Total LUTs,FFs,RAMB36,RAMB18
 
 The upper block shows the resource utilization of instrumented circuit, and the bottom block shows the resource utilization of the uninstrumented circuit. In the paper, we use the word `Logic` for `LUT`, `Register` for `FF`, and calculate the total number of bits from `RAM36` (36Kbit per instance) and `RAM18` (18Kbit per instance). In the above example, the register overhead of an instrumented circuit with a `1024`-depth buffer is `2870-517=2354`.
 
-For `D1`, `D2`, `D3`, `D4`, `D8`, and `C2`, you will see something like the following. We use the `Logic` for `ALM`, `Register` for `FF`, and use the number of `BRAM Blocks` to calculate BRAM size (each block contains 20Kbits).
+For `D1`, `D2`, `D3`, `D5`, `D10`, and `C2`, you will see something like the following. We use the `Logic` for `ALM`, `Register` for `FF`, and use the number of `BRAM Blocks` to calculate BRAM size (each block contains 20Kbits).
 
 ```
 log2(Depth),10,11,12,13
@@ -229,9 +247,9 @@ build_notask: ALM BRAM#B BRAMbit FFs
 
 ### 2.3 LossCheck
 
-Bug `D1`, `D2`, `D3`, and `C2` are the four data loss bugs that can be localized by LossCheck.
+Bug `D1`, `D2`, `D3`, `D4`, `C2`, and `C4` are the six data loss bugs that can be localized by LossCheck.
 
-#### 2.3.1 Data Loss Localization for the 4 Data Loss Bugs
+#### 2.3.1 Data Loss Localization for the 6 Data Loss Bugs
 
 You can use the following command to invoke LossCheck under the directories of these four bugs.
 
@@ -239,7 +257,12 @@ You can use the following command to invoke LossCheck under the directories of t
 make -f Makefile.lc
 ```
 
-This will generate two `.v` files (e.g., a `<benchmark>.losscheck.0.v` and a `<benchmark>.losscheck.1.v`). `<benchmark.losscheck.0.v` is the first instrumentation, which does not filter false positives (as discussed in Section 4.5.3). Our scripts run the original testbench of the circuit on the first instrumentation, and generate a list of signals that should be filtered out (i.e., storing in `filter.txt`). Then, our scripts invoke LossCheck again, generating the second instrumentation (i.e., `<benchmark>.losscheck.1.v`), with the signals in `filter.txt` filtered out.
+For `D1`, `D2`, `D3`, and `C4`:
+This will generate two `.v` files (e.g., a `<benchmark>.losscheck.0.v` and a `<benchmark>.losscheck.1.v`). `<benchmark>.losscheck.0.v` is the first instrumentation, which does not filter false positives (as discussed in Section 4.5.3). Our scripts run the original testbench of the circuit on the first instrumentation, and generate a list of signals that should be filtered out (i.e., storing in `filter.txt`). Then, our scripts invoke LossCheck again, generating the second instrumentation (i.e., `<benchmark>.losscheck.1.v`), with the signals in `filter.txt` filtered out.
+
+For `D4` and `C4`:
+This will generate a `test.v` file, which is the flattened design with LossCheck's instrumentation. These two bugs do not need false positive filtering. As a result, no `filter.txt` file will be generated.
+
 
 To verify that the second instrumentation actually detects the data loss, run the following command:
 
@@ -247,7 +270,7 @@ To verify that the second instrumentation actually detects the data loss, run th
 make -f Makefile.lc sim
 ```
 
-You are expected to see some error message with regard to data loss. For `D2`, `D3`, and `C3`, there should be no false positives. For `D1`, you are expected to see one register that's misidentified. (You will see several rows misreporting the same register.)
+You are expected to see some error message with regard to data loss. For `D2`, `D3`, `D4`, `C2`, and `C4`, there should be no false positives. For `D1`, you are expected to see one register that's misidentified. (You will see several rows misreporting the same register.)
 
 #### 2.3.2 Reproducing the Resource Overhead
 
@@ -263,7 +286,7 @@ And use the following command to report resource utilization.
 make -f Makefile.lc report_util
 ```
 
-You will get something like this:
+For `D1`, `D2`, `D3`, and `C2`, you will get something like this:
 
 ```
 build_withlosscheck: ALM BRAM#B BRAMbit FFs
@@ -272,13 +295,27 @@ build_notask: ALM BRAM#B BRAMbit FFs
 109694;413;5238192;130390
 ```
 
-These four bugs are all on the Intel HARP platform. This platform contains a vendor-provided shell and an user-implemented accelerator. Because the shell is a fixed region, the resource overhead in Figure 3 is normalized to the resource used by the original (i.e., uninstrumented) accelerator (without the shell). You may use the following data as the resource utilization of the shell.
+These four bugs are on the Intel HARP platform. This platform contains a vendor-provided shell and an user-implemented accelerator. Because the shell is a fixed region and is not usable by the accelerator, the resource overhead in Figure 3 is normalized to the total available resource of the accelerator region (i.e., without the shell). You may use the following data as the available resource of the accelerator-usable region.
 
 | ALM    | FFs    |
 | ------ | ------ |
-| 100171 | 108659 |
+| 327029 | 1600141 |
 
-In the above example, the uninstremented accelerator uses 9523 ALMs, and the instrumented accelerator uses 15257 ALMs. As a result, the ALM (logic) overhead is `(15257-9523)=60.2%`.
+In the above example, the uninstremented accelerator uses 9523 ALMs, and the instrumented accelerator uses 15257 ALMs. As a result, the ALM (logic) overhead is `(15257-9523)/327029=1.7%`.
+
+For `D4` and `C4`, you will get something like this:
+
+```
+build_withlosscheck: Total LUTs,FFs,RAMB36,RAMB18
+        1435;2415;16;1
+build_notask: Total LUTs,FFs,RAMB36,RAMB18
+        45;83;0;0
+```
+These two bugs are on the Xilinx platform. There's no shell in the platform so the accelerator can use all resource on the FPGA. You may use the following data as the available resource.
+
+| LUT   | FFs   |
+| ----- | ----- |
+| 203800 | 407600 |
 
 ## 3. Licenses and Terms
 
