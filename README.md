@@ -2,6 +2,10 @@
 
 This artifact includes 20 hardware bugs, each of them can be reproduced with Verilator in a push-button manner. It also includes the five tools we designed to help bug localization (i.e., SignalCat, FSM Monitor, Statistics Monitor, Dependency Monitor, and LossCheck), as well as examples of using these tools and the instructions of reproducing the figures in the paper.
 
+The full list of 68 bugs we studied can be found [here](https://docs.google.com/spreadsheets/d/1GonADjkm878iRs2noQFXW5AidY4KiiJfTPJyIq-3Z4I/edit?usp=sharing).
+
+If you have an interesting bug that you can reproduce, feel free to submit a pull request and we will add it to this repo. If you notice a bug that's not reproducible but still want to share to others, you may request edit access to the spreadsheet and add it there.
+
 ## Table of Contents
 
 - [0. Downloading the Repository](#0-downloading-the-repository)
