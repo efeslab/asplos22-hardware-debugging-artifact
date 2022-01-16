@@ -143,7 +143,7 @@ You are expected to see an error message after `make sim`. `make wave` requires 
 
 Our debugging tools locate in the `veripass` directory. In the `hardware-bugbase` directory, we provide `make` scripts to invoke these debugging tools.
 
-**Warning: A full evaluation of this part takes days, because FPGA synthesis is slow (e.g., up to several hours per-run). We encourage you to evaluate the non-synthesis part (e.g., [2.3.1](#231-data-loss-localization-for-the-4-data-loss-bugs)) first.**
+**Warning: A full evaluation of this part takes days, because FPGA synthesis is slow (e.g., up to several hours per-run). We encourage you to evaluate the non-synthesis part (e.g., [2.3.1](#231-data-loss-localization-for-the-6-data-loss-bugs)) first.**
 
 ### 2.1 Installation
 
@@ -306,6 +306,8 @@ These four bugs are on the Intel HARP platform. This platform contains a vendor-
 | 327029 | 1600141 |
 
 In the above example, the uninstremented accelerator uses 9523 ALMs, and the instrumented accelerator uses 15257 ALMs. As a result, the ALM (logic) overhead is `(15257-9523)/327029=1.7%`.
+
+Specifically, as we mentioned in our paper, the frequency of D3 and C2 (i.e., the Optimus bugs) will be reduced from 400MHz to 200MHz after LossCheck's instrumentation. As a result, we need to add an asynchronous fifo which helps clock domain crossing. When generating the verilog files for compilation, the makefile will add the fifo.
 
 For `D4` and `C4`, you will get something like this:
 
